@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     # Custom App
     "api",
     "products",
+    # Third Party Apps
+    "rest_framework",
 ]
 
 MIDDLEWARE = [
