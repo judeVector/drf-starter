@@ -3,7 +3,7 @@ from rest_framework import generics, mixins, authentication
 
 from .models import Product
 from .serializers import ProductSerializer
-from api.mixins import StaffEditorPermissionMixin
+from api.mixins import StaffEditorPermissionMixin, UserQuerySetMixin
 
 from api.authentication import TokenAuthentication
 
@@ -14,7 +14,9 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
 
 
 # Using generics in class-based views
-class ProductListCreateAPIView(StaffEditorPermissionMixin, generics.ListCreateAPIView):
+class ProductListCreateAPIView(
+    UserQuerySetMixin, StaffEditorPermissionMixin, generics.ListCreateAPIView
+):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     authentication_classes = [
@@ -23,12 +25,23 @@ class ProductListCreateAPIView(StaffEditorPermissionMixin, generics.ListCreateAP
     ]
 
     def perform_create(self, serializer):
+        email = serializer.validated_data.pop("email")
+        # print(email)
         title = serializer.validated_data.get("title")
         content = serializer.validated_data.get("content") or None
 
         if content is None:
             content = title
-            serializer.save(content=content)
+            serializer.save(user=self.request.user, content=content)
+
+    # This will make authenticated users to only see their own post and not others
+    # def get_queryset(self, *args, **kwargs):
+    #     qs = super().get_queryset(*args, **kwargs)
+    #     request = self.request
+    #     user = request.user
+    #     if not user.is_authenticated:
+    #         return Product.objects.none()
+    #     return qs.filter(user=request.user)
 
 
 # Using mixins and generics in class-based views
