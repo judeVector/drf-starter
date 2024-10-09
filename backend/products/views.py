@@ -1,9 +1,9 @@
-from rest_framework import generics, mixins, permissions, authentication
+from rest_framework import generics, mixins, authentication
 
 
 from .models import Product
 from .serializers import ProductSerializer
-from .permissions import IsStaffEditorPermission
+from api.mixins import StaffEditorPermissionMixin
 
 from api.authentication import TokenAuthentication
 
@@ -14,14 +14,13 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
 
 
 # Using generics in class-based views
-class ProductListCreateAPIView(generics.ListCreateAPIView):
+class ProductListCreateAPIView(StaffEditorPermissionMixin, generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     authentication_classes = [
         authentication.SessionAuthentication,
         TokenAuthentication,
     ]
-    permission_classes = [IsStaffEditorPermission]
 
     def perform_create(self, serializer):
         title = serializer.validated_data.get("title")
