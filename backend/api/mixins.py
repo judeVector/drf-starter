@@ -7,9 +7,10 @@ class StaffEditorPermissionMixin:
     permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
 
 
-# Thismmixin will make authenticated users to only see their own post and not others
+# This mixin will make authenticated users to only see their own post and not others
 class UserQuerySetMixin:
     user_field = "user"
+    allow_staff_view = False
 
     def get_queryset(self, *args, **kwargs):
         user = self.request.user
