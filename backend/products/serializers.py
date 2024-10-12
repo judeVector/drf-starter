@@ -6,8 +6,19 @@ from .validators import validate_title
 from api.serializers import UserPublicSerializer
 
 
+class ProductLinlineSerializer(serializers.Serializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="product-detail", lookup_field="pk", read_only=True
+    )
+
+    title = serializers.CharField(read_only=True)
+
+
 class ProductSerializer(serializers.ModelSerializer):
     owner = UserPublicSerializer(source="user", read_only=True)
+    related_products = ProductLinlineSerializer(
+        source="user.product_set.all", read_only=True, many=True
+    )
     my_discount = serializers.SerializerMethodField(read_only=True)
     edit_url = serializers.SerializerMethodField(read_only=True)
     url = serializers.HyperlinkedIdentityField(
@@ -23,6 +34,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "url",
             "edit_url",
             "pk",
+            "related_products",
             # "email",
             "title",
             "content",
