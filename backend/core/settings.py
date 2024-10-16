@@ -22,7 +22,8 @@ REST_FRAMEWORK = {
         "api.authentication.TokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly"
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 5,
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
     # Third Party Apps
     "rest_framework",
     "rest_framework.authtoken",
+    "rest_framework_simplejwt",
     # Third Party API services
     "algoliasearch_django",
 ]

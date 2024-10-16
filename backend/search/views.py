@@ -10,11 +10,15 @@ from . import client
 
 class SearchListView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
+        user = None
+        if request.user.is_authenticated:
+            user = request.user.username
         query = request.GET.get("q")
-        tag = request.GET.get("tag")
+        public = str(request.GET.get("public")) != "0"
+        tag = request.GET.get("tag") or None
         if not query:
             return Response("", status=status.HTTP_400_BAD_REQUEST)
-        results = client.perform_search(query, tags=tag)
+        results = client.perform_search(query, tags=tag, user=user, public=public)
         return Response(results)
 
 
@@ -24,11 +28,11 @@ class SearchListOldView(generics.ListAPIView):
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
-        query = self.request.GET.get("q")
+        q = self.request.GET.get("q")
         results = Product.objects.none()
-        if query is not None:
+        if q is not None:
             user = None
             if self.request.user.is_authenticated:
                 user = self.request.user
-            results = qs.search(query, user=user)
+            results = qs.search(q, user=user)
         return results
